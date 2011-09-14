@@ -1,0 +1,13 @@
+# Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
+
+one:
+  data_start: 2011-05-17
+  data_finish: 2011-05-17
+  countri_id: 1
+  film_id: 1
+
+two:
+  data_start: 2011-05-17
+  data_finish: 2011-05-17
+  countri_id: 1
+  film_id: 1

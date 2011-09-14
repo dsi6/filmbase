@@ -1,0 +1,16 @@
+%p
+  %b Дата начала:
+  = @rental.data_start
+%p
+  %b Дата конца:
+  = @rental.data_finish
+%p
+  %b Страна:
+  = @rental.country_id
+%p
+  %b Фильм:
+  = @rental.film_id
+
+= link_to 'Редактировать', edit_rental_path(@rental)
+\|
+= link_to 'Назад', rentals_film_path(@rental.film)

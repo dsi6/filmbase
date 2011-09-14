@@ -1,0 +1,14 @@
+%p
+  %b Дни сборов:
+  = @box_office.rental_id
+%p
+  %b Номер недели:
+  = @box_office.number_week
+%p
+  %b Сумма за неделю:
+  = @box_office.sum_all
+
+= link_to 'Редактировать', edit_box_office_path(@box_office)
+\|
+=link_to 'Назад', box_offices_rental_path(@box_office.rental.film)
+

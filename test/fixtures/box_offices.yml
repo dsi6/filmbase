@@ -1,0 +1,11 @@
+# Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
+
+one:
+  id_rental: 1
+  number_week: 1
+  sum_all: 1
+
+two:
+  id_rental: 1
+  number_week: 1
+  sum_all: 1

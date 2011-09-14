@@ -1,0 +1,26 @@
+%h1 Дни сбора
+-unless @world_rentals.blank?
+  %table
+    %tr
+      %th Фильм
+      %th Сборы за последнюю неделю в мире
+    -@world_rentals.each do |wr|
+      %tr
+        %td
+          =link_to wr["name"], film_path(wr["filmid"])
+        %td=number_to_currency(wr["sum"], :unit => "$", :separator => ",", :delimiter => " ")
+%br      
+-unless @rus_rentals.blank?  
+  %table
+    %tr
+      %th Фильм
+      %th Сборы за последнюю неделю в России
+    -@rus_rentals.each do |rr|
+      %tr
+        %td
+          =link_to rr["name"], film_path(rr["filmid"])
+        %td=number_to_currency(rr["sum"], :unit => "$", :separator => ",", :delimiter => " ")
+=paginate @rentals
+%br
+= link_to 'К списку фильмов', films_path
+

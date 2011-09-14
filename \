@@ -1,0 +1,99 @@
+class RentalsController < ApplicationController
+  before_filter :check_admin_user, :except=>['index', 'show', 'box_offices']
+  
+  
+  def index
+    @rentals = Rental.page(params[:page]) 
+    w_l=Time.now.strftime('%W')
+
+@n = Film.includes(:rentals=>:box_offices).where(:box_offices=>{:number_week=>w_l}).group("name").limit(3).order("sum_all DESC").sum(:sum_all)
+@n1 = Film.includes(:rentals=>[:box_offices, :country]).where(:box_offices=>{:number_week=>w_l},:countries=>{:id=>170}).group("films.name").limit(3).order("sum_all DESC").sum(:sum_all)
+   
+    respond_to do |format|
+      format.html # index.html.erb
+      format.xml  { render :xml => @rentals }
+    end
+  end
+
+  # GET /rentals/1
+  # GET /rentals/1.xml
+  def show
+    @rental = Rental.find(params[:id])
+    
+    respond_to do |format|
+      format.html # show.html.erb
+      format.xml  { render :xml => @rental }
+    end
+  end
+
+  # GET /rentals/new
+  # GET /rentals/new.xml
+  def new
+    @rental = Rental.new
+
+    respond_to do |format|
+      format.html # new.html.erb
+      format.xml  { render :xml => @rental }
+    end
+  end
+
+  # GET /rentals/1/edit
+  def edit
+    @rental = Rental.find(params[:id])
+  end
+
+  # POST /rentals
+  # POST /rentals.xml
+  def create
+    @rental = Rental.new(params[:rental])
+    
+    a = (@rental.data_start+6.day) < @rental.data_finish 
+    if a == false
+      @rental.errors.add(:data_finish, "Разница между датами должна быть больше недели")
+      render :action => "new"
+      return
+    end
+    respond_to do |format|
+      if @rental.save
+        format.html { redirect_to(rental_films_path(@rental.film), :notice => 'Сохранено') }
+        format.xml  { render :xml => @rental, :status => :created, :location => @rental }
+      else
+        format.html { render :action => "new" }
+        format.xml  { render :xml => @rental.errors, :status => :unprocessable_entity }
+      end
+    end
+  end
+
+  # PUT /rentals/1
+  # PUT /rentals/1.xml
+  def update
+    @rental = Rental.find(params[:id])
+
+    respond_to do |format|
+      if @rental.update_attributes(params[:rental])
+        format.html { redirect_to("/films/#{@rental.film_id}/rentals", :notice => 'Дата сборов сохранена.') }
+        format.xml  { head :ok }
+      else
+        format.html { render :action => "edit" }
+        format.xml  { render :xml => @rental.errors, :status => :unprocessable_entity }
+      end
+    end
+  end
+
+  # DELETE /rentals/1
+  # DELETE /rentals/1.xml
+  def destroy
+    @rental = Rental.find(params[:id])
+    @rental.destroy
+
+    respond_to do |format|
+      format.html { redirect_to("/films/#{@rental.film_id}/rentals") }
+      format.xml  { head :ok }
+    end
+  end
+  
+    def box_offices
+    #raise params.inspect
+    @box_offices = BoxOffice.where(:id_rental => Rental.where(:film_id => params[:id])).order("number_week").page(params[:page])
+  end
+end

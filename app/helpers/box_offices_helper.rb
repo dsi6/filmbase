@@ -1,0 +1,2 @@
+module BoxOfficesHelper
+end

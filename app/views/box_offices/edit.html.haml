@@ -1,0 +1,7 @@
+%h1 Кассовые сборы за неделю
+
+= render 'form'
+
+= link_to 'Просмотр', @box_office
+\|
+= link_to 'Назад', box_offices_rental_path(@box_office.rental.film)

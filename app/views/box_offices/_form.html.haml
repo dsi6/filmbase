@@ -1,0 +1,17 @@
+= form_for @box_office do |f|
+  -if @box_office.errors.any?
+    .div.error
+      %ul
+        - @box_office.errors.full_messages.each do |msg|
+          %li= msg
+  .field 
+    = @box_office.rental.country.name
+    = f.hidden_field :rental_id
+  .field
+    = f.label :number_week
+    =f.text_field :number_week, :size=>1
+  .field
+    = f.label :sum_all
+    = f.text_field :sum_all, :size=>12
+  .actions
+    = f.submit 'Сохранить'

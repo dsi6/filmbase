@@ -1,0 +1,8 @@
+%h1 Просмотр дней сбора
+
+= render 'form'
+
+= link_to 'Просмотр', @rental
+\|
+
+= link_to 'Назад', rentals_film_path(@rental.film)

@@ -1,0 +1,33 @@
+%h1 Дни сбора
+
+%table
+  %tr
+    %th Дата начала
+    %th Дата конца
+    %th Страна
+    %th Фильм
+    -if @current_user && @current_user.admin?
+      %th
+      %th
+      %th
+
+
+  - @rentals.each do |rental|
+    %tr
+      %td= l rental.data_start, :format=>:long
+      %td= l rental.data_finish, :format=>:long
+      %td= rental.country.name
+      %td=link_to rental.film.name, rental.film
+      -if @current_user && @current_user.admin?
+        %td= link_to 'Новая неделя', new_box_office_path(:rental_id=>rental)
+        %td= link_to 'Редактировать', edit_rental_path(rental)
+        %td= link_to 'Удалить', rental, :confirm => 'Вы уверены?', :method => :delete
+=paginate @rentals
+%br
+-if @current_user && @current_user.admin?
+  = link_to 'Новая дата', new_rental_film_path
+  \|
+= link_to 'Кассовые сборы по неделям', box_offices_rental_path(@rental)
+\|
+= link_to 'К списку фильмов', films_path
+

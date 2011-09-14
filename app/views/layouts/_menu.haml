@@ -1,0 +1,8 @@
+#menu.box
+  %ul.box
+    %li{:id=>controller_name=='films' ? "menu-active" : nil}=link_to content_tag(:span,"Фильмы"),films_path
+    %li{:id=>controller_name=='people' ? "menu-active" : nil}=link_to content_tag(:span,"Персоны"),people_path
+    %li{:id=>controller_name=='rentals' ? "menu-active" : nil}=link_to content_tag(:span,"Статистика"),rentals_path
+    -if @current_user && @current_user.admin?
+      %li{:id=>controller_name=='countries' ? "menu-active" : nil}=link_to content_tag(:span,"Страны"),countries_path
+      %li{:id=>controller_name=='genres' ? "menu-active" : nil}=link_to content_tag(:span,"Жанры"),genres_path

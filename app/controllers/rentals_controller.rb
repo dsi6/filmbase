@@ -1,0 +1,136 @@
+class RentalsController < ApplicationController
+  before_filter :check_admin_user, :except=>['index', 'show', 'box_offices']
+  
+  
+  def index
+    @rentals = Rental.page(params[:page])
+    
+    russia_id = 170
+    @rus_rentals, @world_rentals = [], []
+    year_now = Time.now.year
+    @f = Film.all
+    @f.each do |film|
+      fname = film.name
+      film_id = film.id
+      if film.rentals.size != 0
+        #  russia
+        rentals = film.rentals.where(:country_id => russia_id).first
+        if rentals.data_start.year == year_now
+          rus = film.rentals.where(:country_id => russia_id).first.box_offices          
+          if rus.size != 0
+            
+            rus_rental = rus.where(:number_week => rus.maximum(:number_week)).first.sum_all
+            @rus_rentals << {"name" => fname,
+              "sum" => rus_rental,
+              "filmid" =>  film_id
+            }
+          end       
+        end
+        # world
+        world_sum = 0
+        film.rentals.find_each do |rental|
+          if rental.data_start.year == year_now
+            box_office = rental.box_offices
+            if box_office.size != 0
+              world_sum += box_office.where(:number_week => box_office.maximum(:number_week)).first.sum_all
+            end
+          end
+        end
+        if world_sum != 0
+          @world_rentals << {"name" => fname,
+            "sum" => world_sum,
+            "filmid" =>  film_id
+          }
+        end           
+      end
+    end
+    @rus_rentals = @rus_rentals.sort_by { |r| r["sum"]}.reverse
+    @world_rentals = @world_rentals.sort_by { |r| r["sum"]}.reverse    
+    respond_to do |format|
+      format.html # index.html.erb
+      format.xml  { render :xml => @rentals }
+    end
+  end
+  
+  # GET /rentals/1
+  # GET /rentals/1.xml
+  def show
+    @rental = Rental.find(params[:id])
+    
+    respond_to do |format|
+      format.html # show.html.erb
+      format.xml  { render :xml => @rental }
+    end
+  end
+  
+  # GET /rentals/new
+  # GET /rentals/new.xml
+  def new
+    @rental = Rental.new
+
+    respond_to do |format|
+      format.html # new.html.erb
+      format.xml  { render :xml => @rental }
+    end
+  end
+  
+  # GET /rentals/1/edit
+  def edit
+    @rental = Rental.find(params[:id])
+  end
+  
+  # POST /rentals
+  # POST /rentals.xml
+  def create
+    @rental = Rental.new(params[:rental])
+    
+    a = (@rental.data_start+6.day) < @rental.data_finish 
+    if a == false
+      @rental.er
+      render :action => "new"
+      return
+    end
+    respond_to do |format|
+      if @rental.save
+        format.html { redirect_to(rentals_film_path(@rental.film), :notice => 'Сохранено') }
+        format.xml  { render :xml => @rental, :status => :created, :location => @rental }
+      else
+        format.html { render :action => "new" }
+        format.xml  { render :xml => @rental.errors, :status => :unprocessable_entity }
+      end
+    end
+  end
+
+  # PUT /rentals/1
+  # PUT /rentals/1.xml
+  def update
+    @rental = Rental.find(params[:id])
+    
+    respond_to do |format|
+      if @rental.update_attributes(params[:rental])
+        format.html { redirect_to(rentals_film_path(@rental.film), :notice => 'Дата сборов сохранена.') }
+        format.xml  { head :ok }
+      else
+        format.html { render :action => "edit" }
+        format.xml  { render :xml => @rental.errors, :status => :unprocessable_entity }
+      end
+    end
+  end
+  
+  # DELETE /rentals/1
+  # DELETE /rentals/1.xml
+  def destroy
+    @rental = Rental.find(params[:id])
+    @rental.destroy
+
+    respond_to do |format|
+      format.html { redirect_to(rentals_film_path(@rental.film)) }
+      format.xml  { head :ok }
+    end
+  end
+
+  def box_offices
+  @film = Film.full_load.find(params[:id]) 
+    @box_offices = BoxOffice.where(:rental_id => Rental.where(:film_id => params[:id])).order("number_week").page(params[:page])
+  end
+end

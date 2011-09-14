@@ -1,0 +1,25 @@
+%h1=@film.name 
+
+%table
+  %tr
+    %th Страна-фильм
+    %th Номер недели
+    %th Сумма сборов
+    -if @current_user && @current_user.admin?
+      %th
+      %th
+    
+  - @box_offices.each do |box_office|
+    %tr
+      -country = Country.find(Rental.find(box_office.rental_id).country_id).name
+      -film = Film.find(Rental.find(box_office.rental_id).film_id)       
+      %td=link_to country + " - " + film.name, film
+
+      %td= box_office.number_week
+      %td= number_to_currency(box_office.sum_all, :unit => "$", :separator => ",", :delimiter => " ")
+      -if @current_user && @current_user.admin?
+        %td= link_to 'Редактировать', edit_box_office_path(box_office)
+        %td= link_to 'Удалить', box_office, :confirm => 'Вы уверены?', :method => :delete
+=paginate @box_offices
+%br
+= link_to "Назад", rentals_film_path(@film)

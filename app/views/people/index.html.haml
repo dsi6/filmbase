@@ -1,0 +1,7 @@
+%h1 Персоны
+-@people.each do |person|
+  =render "people/person",:person=>person
+=paginate @people
+-if @current_user.try(:admin?)
+  %br
+  = link_to 'Новая персона', new_person_path
